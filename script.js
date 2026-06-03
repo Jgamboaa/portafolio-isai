@@ -15,7 +15,7 @@ function button(iconName, url, text = "", solid = false) {
 }
 
 function media(mediaData, footer = false) {
-  const cv = button("file-text", `assets${mediaData.cv}`, "");
+  const cv = button("file-text", `assets${mediaData.cv}`, "Ver hoja de vida");
   const github = safeUrl(mediaData.github)
     ? button("github", mediaData.github, "")
     : "";
@@ -103,7 +103,6 @@ function render() {
       <div class="header-info">
         ${heading(data.name, true)}
         ${heading(data.skill)}
-        <p class="location">${icon("map-pin")}<span>${data.location}</span></p>
         ${media(data.media)}
       </div>
     </header>
