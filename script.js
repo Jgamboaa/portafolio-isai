@@ -142,3 +142,19 @@ function render() {
 }
 
 render();
+
+// Image Preview Modal Logic
+document.addEventListener("click", (e) => {
+  // Open modal
+  if (e.target.classList.contains("info-image")) {
+    const modal = document.getElementById("image-modal");
+    const modalImg = document.getElementById("image-modal-content");
+    modal.style.display = "flex";
+    modalImg.src = e.target.src;
+  }
+
+  // Close modal
+  if (e.target.id === "image-modal" || e.target.id === "close-modal") {
+    document.getElementById("image-modal").style.display = "none";
+  }
+});
