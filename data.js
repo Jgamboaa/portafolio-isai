@@ -102,7 +102,7 @@ window.PORTFOLIO_DATA = {
   ],
   projects: [
     {
-      image: "/hrms.png",
+      folder: "hrms",
       title: "Sistema de Gestión de Recursos Humanos (HRMS)",
       technologies: [
         { icon: "devicon-php-plain", name: "PHP" },
@@ -114,7 +114,7 @@ window.PORTFOLIO_DATA = {
         "Desarrollé un sistema HRMS personalizado para gestionar asistencia, nóminas, contratos, vacaciones e indicadores de desempeño, optimizando la administración de recursos humanos.",
     },
     {
-      image: "/hiring.png",
+      folder: "hiring",
       title: "Portal de pruebas psicometricas",
       technologies: [
         { icon: "devicon-react-original", name: "React" },
@@ -125,7 +125,7 @@ window.PORTFOLIO_DATA = {
         "Desarrollé un portal de pruebas psicométricas con React, integrando APIs para evaluación de candidatos, mejorando la eficiencia del proceso de selección, en este proyecto digitalice los test: Moss, Toma de decisiones, Raven, BSPA númerico, BSPA-CA, Otis intermedio, Test de inteligencia emocional, Test de temperamentos, DISC. ",
     },
     {
-      image: "/marcaje.png",
+      folder: "marcaje",
       title: "Portal de marcaje con reconocimiento facial",
       technologies: [
         { icon: "devicon-react-original", name: "React" },
@@ -137,7 +137,7 @@ window.PORTFOLIO_DATA = {
         "Desarrollé un portal de marcaje con un microservicio Python para reconocimiento facial, integrando APIs para autenticación de empleados, mejorando la precisión y eficiencia del control de asistencia.",
     },
     {
-      image: "/RAG.png",
+      folder: "RAG",
       title: "Sistema RAG",
       technologies: [
         { icon: "devicon-react-original", name: "React" },

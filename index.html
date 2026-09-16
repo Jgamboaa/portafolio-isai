@@ -17,9 +17,14 @@
   <main class="page" id="app"></main>
 
   <!-- Image Modal -->
-  <div id="image-modal" class="image-modal">
-    <span class="close-modal" id="close-modal">&times;</span>
-    <img class="image-modal-content" id="image-modal-content">
+  <div id="image-modal" class="image-modal" role="dialog" aria-modal="true" aria-label="Visor de imágenes">
+    <span class="close-modal" id="close-modal" aria-label="Cerrar">&times;</span>
+    <button type="button" class="modal-nav modal-prev" id="modal-prev" aria-label="Imagen anterior">&#10094;</button>
+    <div class="modal-viewer" id="modal-viewer">
+      <img class="image-modal-content" id="image-modal-content" alt="">
+      <div class="modal-thumbs hidden" id="modal-thumbs" role="listbox" aria-label="Miniaturas del proyecto"></div>
+    </div>
+    <button type="button" class="modal-nav modal-next" id="modal-next" aria-label="Imagen siguiente">&#10095;</button>
   </div>
 
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
