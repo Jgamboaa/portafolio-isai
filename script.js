@@ -47,9 +47,11 @@ function infoDetail(item, showIcon = true) {
     ? `<div class="badges">${item.technologies.map(smallTechBadge).join("")}</div>`
     : "";
   const actions = `${safeUrl(item.url) ? button("link", item.url) : ""}${safeUrl(item.github) ? button("github", item.github) : ""}`;
-  const image = item.image
-    ? `<img class="info-image" src="assets${item.image}" alt="${item.title}">`
-    : "";
+  const image = item.folder
+    ? `<img class="info-image" src="assets/${item.folder}/1.png" alt="${item.title}" data-folder="${item.folder}">`
+    : item.image
+      ? `<img class="info-image" src="assets${item.image}" alt="${item.title}">`
+      : "";
   const date = item.date ? `<span class="badge">${item.date}</span>` : "";
   const cert = safeUrl(item.certificate)
     ? button("shield-check", item.certificate, "", true)
@@ -143,18 +145,153 @@ function render() {
 
 render();
 
-// Image Preview Modal Logic
-document.addEventListener("click", (e) => {
-  // Open modal
-  if (e.target.classList.contains("info-image")) {
-    const modal = document.getElementById("image-modal");
-    const modalImg = document.getElementById("image-modal-content");
-    modal.style.display = "flex";
-    modalImg.src = e.target.src;
+// Image gallery modal
+const GALLERY_MAX = 30;
+const galleryCache = new Map();
+const galleryState = {
+  images: [],
+  index: 0,
+};
+
+function projectImagePath(folder, n) {
+  return `assets/${folder}/${n}.png`;
+}
+
+function imageExists(src) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => resolve(true);
+    img.onerror = () => resolve(false);
+    img.src = src;
+  });
+}
+
+async function discoverImages(folder) {
+  if (galleryCache.has(folder)) return galleryCache.get(folder);
+
+  const images = [];
+  for (let i = 1; i <= GALLERY_MAX; i++) {
+    const src = projectImagePath(folder, i);
+    if (!(await imageExists(src))) break;
+    images.push(src);
   }
 
-  // Close modal
-  if (e.target.id === "image-modal" || e.target.id === "close-modal") {
-    document.getElementById("image-modal").style.display = "none";
+  const result = images.length ? images : [projectImagePath(folder, 1)];
+  galleryCache.set(folder, result);
+  return result;
+}
+
+function renderThumbs() {
+  const thumbs = document.getElementById("modal-thumbs");
+  const total = galleryState.images.length;
+
+  if (total <= 1) {
+    thumbs.innerHTML = "";
+    thumbs.classList.add("hidden");
+    return;
   }
+
+  thumbs.classList.remove("hidden");
+  thumbs.innerHTML = galleryState.images
+    .map(
+      (src, i) =>
+        `<button type="button" class="modal-thumb${i === galleryState.index ? " is-active" : ""}" data-index="${i}" aria-label="Imagen ${i + 1}" aria-selected="${i === galleryState.index}">
+          <img src="${src}" alt="">
+        </button>`
+    )
+    .join("");
+
+  const active = thumbs.querySelector(".is-active");
+  if (active) {
+    active.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+  }
+}
+
+function updateGalleryView() {
+  const modalImg = document.getElementById("image-modal-content");
+  const prevBtn = document.getElementById("modal-prev");
+  const nextBtn = document.getElementById("modal-next");
+  const total = galleryState.images.length;
+  if (!total) return;
+
+  modalImg.src = galleryState.images[galleryState.index];
+  const showNav = total > 1;
+  prevBtn.classList.toggle("hidden", !showNav);
+  nextBtn.classList.toggle("hidden", !showNav);
+  renderThumbs();
+}
+
+async function openGallery(folder, startIndex = 0) {
+  const modal = document.getElementById("image-modal");
+  modal.style.display = "flex";
+  galleryState.images = await discoverImages(folder);
+  galleryState.index = Math.min(startIndex, galleryState.images.length - 1);
+  updateGalleryView();
+}
+
+function openSingleImage(src) {
+  galleryState.images = [src];
+  galleryState.index = 0;
+  document.getElementById("image-modal").style.display = "flex";
+  updateGalleryView();
+}
+
+function closeGallery() {
+  document.getElementById("image-modal").style.display = "none";
+  galleryState.images = [];
+  galleryState.index = 0;
+  document.getElementById("modal-thumbs").innerHTML = "";
+}
+
+function navigateGallery(delta) {
+  const total = galleryState.images.length;
+  if (total <= 1) return;
+  galleryState.index = (galleryState.index + delta + total) % total;
+  updateGalleryView();
+}
+
+function goToGalleryIndex(index) {
+  if (index < 0 || index >= galleryState.images.length) return;
+  galleryState.index = index;
+  updateGalleryView();
+}
+
+function isGalleryOpen() {
+  return document.getElementById("image-modal").style.display === "flex";
+}
+
+document.addEventListener("click", (e) => {
+  if (e.target.classList.contains("info-image")) {
+    const folder = e.target.dataset.folder;
+    if (folder) openGallery(folder, 0);
+    else openSingleImage(e.target.src);
+    return;
+  }
+
+  const thumb = e.target.closest(".modal-thumb");
+  if (thumb) {
+    goToGalleryIndex(Number(thumb.dataset.index));
+    return;
+  }
+
+  if (e.target.id === "modal-prev") {
+    navigateGallery(-1);
+    return;
+  }
+
+  if (e.target.id === "modal-next") {
+    navigateGallery(1);
+    return;
+  }
+
+  if (e.target.id === "image-modal" || e.target.id === "close-modal") {
+    closeGallery();
+  }
+});
+
+document.addEventListener("keydown", (e) => {
+  if (!isGalleryOpen()) return;
+  if (e.key === "Escape") closeGallery();
+  if (e.key === "ArrowLeft") navigateGallery(-1);
+  if (e.key === "ArrowRight") navigateGallery(1);
 });
